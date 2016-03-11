@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="pinterestStyle.css"/>
+</head>
+<body>
+<script>
+    $(document).ready(function() {
+        var originalState = $("div#columns").html();
+        $("#submitButton").click(function (event) {
+            $("div#columns").html(originalState);
+            event.preventDefault();
+            var query = $("input#query").val();
+            var service_url = 'https://kgsearch.googleapis.com/v1/entities:search';
+            var params = {
+                'query': query,
+                'limit': 30,
+                'indent': true,
+                'key': 'AIzaSyCI8Y-qv80T1ekbWRQGOxASmkcZtFAn2Ic',
+            };
+            $.getJSON(service_url + '?callback=?', params, function (response) {
+                $.each(response.itemListElement, function (i, element) {
+                    var result = element['result'] || "";
+                    var description = result['description'] || "";
+                    var name = result['name'] || "";
+                    // var url = result['url'] || "";
+                    var detail = result['detailedDescription'] || "";
+                    var articleBody = detail['articleBody'] || "";
+                    var detailUrl = detail['url'] || "";
+                    var image = result['image'] || "";
+                    var imageUrl = image['contentUrl'] || "";
+                    var img = imageUrl ? $('<img>',{src: imageUrl}) : "";
+                    var des = $('<p>',{text: articleBody});
+                    var h1 = $('<h1>',{text: name});
+                    var h3 = $('<h3>',{text: description});
+                    var ahref = detailUrl ? $('<a>',{href: detailUrl, text: "Read More..."}) : "";
+                    $('<div>').addClass("pin").append(h1).append(img).append(h3).append(des).append(ahref).appendTo("div#columns");
+//                    $('<img>',{src: imageUrl}).appendTo(document.body);
+                });
+            });
+        });
+    });
+</script>
+<h1>Google Knowledge Search</h1>
+<form id="searchForm">
+    <input id="query" type="text" placeholder="Want to know something?">
+    <button id="submitButton">Search</button>
+</form>
+<div id="columns">
+</div>
+</body>
+</html>
